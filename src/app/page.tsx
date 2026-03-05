@@ -54,7 +54,7 @@ export default function Home() {
   const [activeChapter, setActiveChapter] = useState<typeof CHAPTERS[0] | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
 
   const handleSelectChapter = (chapter: typeof CHAPTERS[0]) => {
     setActiveChapter(chapter);
@@ -87,16 +87,13 @@ export default function Home() {
 
   return (
     <div className="w-screen h-screen bg-[#05050a] text-white overflow-hidden">
-      {/* Preload assets with callback when complete */}
-      <PreloadAssets onComplete={() => setAssetsLoaded(true)} />
+      {/* Preload assets - avatar first, rest in background */}
+      <PreloadAssets onAvatarLoaded={() => setAvatarLoaded(true)} />
 
       <AnimatePresence mode="wait">
-        {phase === "intro" && (
+        {phase === "intro" && avatarLoaded && (
           <motion.div key="intro" className="w-full h-full">
-            <IntroSequence 
-              onComplete={() => setPhase("timeline")} 
-              assetsLoaded={assetsLoaded}
-            />
+            <IntroSequence onComplete={() => setPhase("timeline")} />
           </motion.div>
         )}
 
