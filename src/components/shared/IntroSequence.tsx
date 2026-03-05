@@ -246,7 +246,7 @@ export function IntroSequence({ onComplete, assetsLoaded }: IntroSequenceProps) 
                 {/* Photo */}
                 <div className="absolute inset-1 rounded-full overflow-hidden">
                   <img
-                    src="/avatar/DSCF5853.jpg"
+                    src="/avatar/DSCF5853.png"
                     alt="Us"
                     className="w-full h-full object-cover"
                   />
