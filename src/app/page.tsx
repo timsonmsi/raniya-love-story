@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IntroSequence } from "@/components/shared/IntroSequence";
 import { Timeline } from "@/components/timeline/Timeline";
@@ -47,14 +47,18 @@ const CHAPTERS = [
   { id: "november", name: "November 10", color: "#FFEE58", year: "November 2025" },
 ];
 
-type AppPhase = "intro" | "timeline" | "chapterIntro" | "chapter" | "celebrate";
+type AppPhase = "loading" | "intro" | "timeline" | "chapterIntro" | "chapter" | "celebrate";
 
 export default function Home() {
-  const [phase, setPhase] = useState<AppPhase>("intro");
+  const [phase, setPhase] = useState<AppPhase>("loading");
   const [activeChapter, setActiveChapter] = useState<typeof CHAPTERS[0] | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [avatarLoaded, setAvatarLoaded] = useState(false);
+
+  const handleAssetsLoaded = () => {
+    console.log('✅ All assets loaded, starting intro...');
+    setPhase("intro");
+  };
 
   const handleSelectChapter = (chapter: typeof CHAPTERS[0]) => {
     setActiveChapter(chapter);
@@ -87,11 +91,13 @@ export default function Home() {
 
   return (
     <div className="w-screen h-screen bg-[#05050a] text-white overflow-hidden">
-      {/* Preload assets - avatar first, rest in background */}
-      <PreloadAssets onAvatarLoaded={() => setAvatarLoaded(true)} />
+      {/* Loading screen - caches ALL assets before starting */}
+      {phase === "loading" && (
+        <PreloadAssets onComplete={handleAssetsLoaded} />
+      )}
 
       <AnimatePresence mode="wait">
-        {phase === "intro" && avatarLoaded && (
+        {phase === "intro" && (
           <motion.div key="intro" className="w-full h-full">
             <IntroSequence onComplete={() => setPhase("timeline")} />
           </motion.div>

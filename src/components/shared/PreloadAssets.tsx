@@ -1,61 +1,28 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface PreloadAssetsProps {
-  onAvatarLoaded?: () => void;
+  onComplete: () => void;
 }
 
-export function PreloadAssets({ onAvatarLoaded }: PreloadAssetsProps) {
+export function PreloadAssets({ onComplete }: PreloadAssetsProps) {
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
-    console.log('🎯 Starting asset preloading...');
+    console.log('🎯 Preloading all assets for instant experience...');
 
-    // STEP 1: Preload avatar photo FIRST - then start website immediately
-    const img = new Image();
-    img.src = '/avatar/DSCF5853.png';
-    img.onload = () => {
-      console.log('✅ Avatar loaded - Starting website!');
-      // Start website immediately after avatar loads
-      if (onAvatarLoaded) onAvatarLoaded();
+    // Create image cache in memory
+    const imageCache: HTMLImageElement[] = [];
+    
+    // STEP 1: Preload avatar (CRITICAL - needed for intro)
+    const avatarImg = new Image();
+    avatarImg.src = '/avatar/DSCF5853.png';
+    avatarImg.onload = () => {
+      imageCache.push(avatarImg);
+      console.log('✅ Avatar cached in memory');
       
-      // Continue preloading in background
-      preloadMusic();
-    };
-    img.onerror = () => {
-      console.warn('⚠️ Avatar photo failed to load');
-      // Start website anyway
-      if (onAvatarLoaded) onAvatarLoaded();
-    };
-
-    // Preload music in background
-    const preloadMusic = () => {
-      console.log('🎵 Preloading music in background...');
-      const musicFiles = [
-        '/music/Bill Withers  - Just The Two Of Us.mp3',
-        '/music/Craig David - 7 Days.mp3',
-        '/music/BTS - I Need U (Piano).mp3'
-      ];
-
-      let musicLoaded = 0;
-      musicFiles.forEach((src) => {
-        const audio = new Audio();
-        audio.src = src;
-        audio.preload = 'auto';
-        audio.oncanplaythrough = () => {
-          musicLoaded++;
-          console.log(`   ✅ Music: ${src.split('/').pop()}`);
-        };
-        audio.onerror = () => {
-          musicLoaded++;
-          console.warn(`   ⚠️ Music failed: ${src.split('/').pop()}`);
-        };
-        audio.load();
-      });
-    };
-
-    // Preload memory photos in background (for Celebrate page)
-    const preloadMemories = () => {
-      console.log('📸 Preloading memory photos in background...');
+      // STEP 2: Preload all memory photos
       const memoryFiles = [
         '/memories/20250330_000355.jpg',
         '/memories/DSC_0820.png',
@@ -85,25 +52,125 @@ export function PreloadAssets({ onAvatarLoaded }: PreloadAssetsProps) {
 
       let memoriesLoaded = 0;
       memoryFiles.forEach((src) => {
-        const memoryImg = new Image();
-        memoryImg.src = src;
-        memoryImg.onload = () => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+          imageCache.push(img);
           memoriesLoaded++;
           if (memoriesLoaded === memoryFiles.length) {
-            console.log(`✅ All ${memoriesLoaded} memory photos cached!`);
+            console.log(`✅ All ${memoriesLoaded} memory photos cached in memory`);
+            console.log('🎉 All assets ready! Starting website...');
+            setLoaded(true);
+            onComplete();
           }
         };
-        memoryImg.onerror = () => {
+        img.onerror = () => {
           memoriesLoaded++;
+          console.warn(`⚠️ Memory photo failed: ${src.split('/').pop()}`);
+          if (memoriesLoaded === memoryFiles.length) {
+            console.log('⚠️ Some photos failed, starting anyway...');
+            setLoaded(true);
+            onComplete();
+          }
         };
       });
     };
+    
+    avatarImg.onerror = () => {
+      console.warn('⚠️ Avatar failed to load');
+      setLoaded(true);
+      onComplete();
+    };
 
-    // Start memory preloading after a short delay (let music start first)
-    setTimeout(preloadMemories, 2000);
-  }, [onAvatarLoaded]);
+    // STEP 3: Preload music in background (doesn't block start)
+    const musicFiles = [
+      '/music/Bill Withers  - Just The Two Of Us.mp3',
+      '/music/Craig David - 7 Days.mp3',
+      '/music/BTS - I Need U (Piano).mp3'
+    ];
 
-  return null;
+    musicFiles.forEach((src) => {
+      const audio = new Audio();
+      audio.src = src;
+      audio.preload = 'auto';
+      audio.load();
+    });
+    console.log('🎵 Music preloading in background...');
+  }, [onComplete]);
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#02020a]">
+      <div className="text-center">
+        {/* Animated heart loading indicator */}
+        <div className="relative w-20 h-20 mx-auto mb-6">
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `radial-gradient(circle, rgba(255,107,157,0.3) 0%, transparent 70%)`,
+            }}
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.5, 0.2, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div
+            className="text-4xl"
+            animate={{
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            💕
+          </motion.div>
+        </div>
+        
+        {/* Loading text */}
+        <motion.p
+          className="text-white/50 text-sm tracking-widest uppercase"
+          animate={{
+            opacity: [0.5, 1, 0.5],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          {loaded ? 'Ready!' : 'Loading our story...'}
+        </motion.p>
+        
+        {/* Progress dots */}
+        <div className="flex gap-2 justify-center mt-4">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-2 h-2 rounded-full bg-[#FF6B9D]"
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [0.5, 1, 0.5],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
+
+import { motion } from 'framer-motion';
 
 export default PreloadAssets;
