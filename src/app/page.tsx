@@ -66,7 +66,7 @@ export default function Home() {
   };
 
   const handleIntroComplete = () => {
-    setPhase("timeline");
+    setPhase("chapter");
   };
 
   const handleBack = () => {
