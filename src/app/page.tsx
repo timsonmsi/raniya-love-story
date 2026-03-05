@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IntroSequence } from "@/components/shared/IntroSequence";
 import { Timeline } from "@/components/timeline/Timeline";
@@ -29,22 +29,22 @@ import {
 
 const CHAPTERS = [
   { id: "ybs", name: "YBS", color: "#FF6B9D", year: "2019-2025" },
-  { id: "ramadan", name: "First Meeting", color: "#FF8E53", year: "Ramadan 2026" },
-  { id: "bbq", name: "BBQ Party", color: "#FFA726", year: "Spring 2026" },
-  { id: "naruto", name: "Naruto Quiz", color: "#FF7043", year: "Spring 2026" },
-  { id: "wcs", name: "WCS Journey", color: "#EF5350", year: "Summer 2026" },
-  { id: "office", name: "Office Days", color: "#EC407A", year: "Summer 2026" },
-  { id: "summer", name: "Summer Memories", color: "#AB47BC", year: "Summer 2026" },
-  { id: "f1", name: "F1 Movie", color: "#7E57C2", year: "Summer 2026" },
-  { id: "ocean", name: "Ocean Basket", color: "#5C6BC0", year: "Summer 2026" },
-  { id: "chanwon", name: "Chanwon", color: "#42A5F5", year: "June 2026" },
-  { id: "thailand", name: "Thailand", color: "#26C6DA", year: "Summer 2026" },
-  { id: "igem", name: "iGEM", color: "#26A69A", year: "Fall 2026" },
-  { id: "craig", name: "Craig David", color: "#66BB6A", year: "September 2026" },
-  { id: "higgsfield", name: "The Choice", color: "#8BC34A", year: "October 2026" },
-  { id: "driving", name: "Driving Lessons", color: "#9CCC65", year: "October 2026" },
-  { id: "october", name: "October 11", color: "#D4E157", year: "October 2026" },
-  { id: "november", name: "November 10", color: "#FFEE58", year: "November 2026" },
+  { id: "ramadan", name: "First Meeting", color: "#FF8E53", year: "Ramadan 2025" },
+  { id: "bbq", name: "BBQ Party", color: "#FFA726", year: "Spring 2025" },
+  { id: "naruto", name: "Naruto Quiz", color: "#FF7043", year: "Spring 2025" },
+  { id: "wcs", name: "WCS Journey", color: "#EF5350", year: "Summer 2025" },
+  { id: "office", name: "Office Days", color: "#EC407A", year: "Summer 2025" },
+  { id: "summer", name: "Summer Memories", color: "#AB47BC", year: "Summer 2025" },
+  { id: "f1", name: "F1 Movie", color: "#7E57C2", year: "Summer 2025" },
+  { id: "ocean", name: "Ocean Basket", color: "#5C6BC0", year: "Summer 2025" },
+  { id: "chanwon", name: "Chanwon", color: "#42A5F5", year: "June 2025" },
+  { id: "thailand", name: "Thailand", color: "#26C6DA", year: "Summer 2025" },
+  { id: "igem", name: "iGEM", color: "#26A69A", year: "Fall 2025" },
+  { id: "craig", name: "Craig David", color: "#66BB6A", year: "September 2025" },
+  { id: "higgsfield", name: "The Choice", color: "#8BC34A", year: "October 2025" },
+  { id: "driving", name: "Driving Lessons", color: "#9CCC65", year: "October 2025" },
+  { id: "october", name: "October 11", color: "#D4E157", year: "October 2025" },
+  { id: "november", name: "November 10", color: "#FFEE58", year: "November 2025" },
 ];
 
 type AppPhase = "intro" | "timeline" | "chapterIntro" | "chapter" | "celebrate";
@@ -54,6 +54,7 @@ export default function Home() {
   const [activeChapter, setActiveChapter] = useState<typeof CHAPTERS[0] | null>(null);
   const [visited, setVisited] = useState<Set<string>>(new Set());
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
 
   const handleSelectChapter = (chapter: typeof CHAPTERS[0]) => {
     setActiveChapter(chapter);
@@ -61,7 +62,7 @@ export default function Home() {
   };
 
   const handleIntroComplete = () => {
-    setPhase("chapter");
+    setPhase("timeline");
   };
 
   const handleBack = () => {
@@ -86,12 +87,16 @@ export default function Home() {
 
   return (
     <div className="w-screen h-screen bg-[#05050a] text-white overflow-hidden">
-      <PreloadAssets />
+      {/* Preload assets with callback when complete */}
+      <PreloadAssets onComplete={() => setAssetsLoaded(true)} />
 
       <AnimatePresence mode="wait">
         {phase === "intro" && (
           <motion.div key="intro" className="w-full h-full">
-            <IntroSequence onComplete={() => setPhase("timeline")} />
+            <IntroSequence 
+              onComplete={() => setPhase("timeline")} 
+              assetsLoaded={assetsLoaded}
+            />
           </motion.div>
         )}
 

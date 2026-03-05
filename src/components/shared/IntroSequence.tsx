@@ -1,4 +1,5 @@
 "use client";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { startGlobalAudio } from "./MusicPlayer";
@@ -14,29 +15,39 @@ const BG_STARS = Array.from({ length: 80 }, (_, i) => ({
 
 const TITLE_LETTERS = "OUR LOVE STORY".split("");
 
-export function IntroSequence({ onComplete }: { onComplete: () => void }) {
+interface IntroSequenceProps {
+  onComplete: () => void;
+  assetsLoaded: boolean;
+}
+
+export function IntroSequence({ onComplete, assetsLoaded }: IntroSequenceProps) {
   const [step, setStep] = useState(0);
   const [audioStarted, setAudioStarted] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
+
+  // Wait for assets to load, then start intro
+  useEffect(() => {
+    if (assetsLoaded) {
+      const timer = setTimeout(() => {
+        setShowIntro(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [assetsLoaded]);
 
   useEffect(() => {
+    if (!showIntro) return;
+
     const timings = [300, 800, 1400, 2400, 3200, 4000];
     const timers = timings.map((t, i) =>
       setTimeout(() => setStep(i + 1), t)
     );
     return () => timers.forEach(clearTimeout);
-  }, []);
-
-  // Preload image
-  useEffect(() => {
-    const img = new Image();
-    img.src = "/avatar/DSCF5853.jpg";
-    img.onload = () => setImageLoaded(true);
-  }, []);
+  }, [showIntro]);
 
   useEffect(() => {
     const startAudio = async () => {
-      if (audioStarted) return;
+      if (audioStarted || !showIntro) return;
       const started = await startGlobalAudio();
       if (started) setAudioStarted(true);
     };
@@ -49,7 +60,26 @@ export function IntroSequence({ onComplete }: { onComplete: () => void }) {
       window.removeEventListener('click', handleClick);
       window.removeEventListener('keydown', handleClick);
     };
-  }, [audioStarted]);
+  }, [audioStarted, showIntro]);
+
+  if (!showIntro) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-[#02020a]">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-[#FF6B9D] border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-white/50 text-sm tracking-widest uppercase">Loading...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -165,7 +195,7 @@ export function IntroSequence({ onComplete }: { onComplete: () => void }) {
 
         {/* Photo reveal */}
         <AnimatePresence>
-          {step >= 4 && imageLoaded && (
+          {step >= 4 && (
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
