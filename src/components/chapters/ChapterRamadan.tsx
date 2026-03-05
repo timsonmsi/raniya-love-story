@@ -167,7 +167,7 @@ function Stage3({ onDone }: { onDone: () => void }) {
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
   const gameAreaRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   // Initialize barriers with random gaps
   const initGame = useCallback(() => {
