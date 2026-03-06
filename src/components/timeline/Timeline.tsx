@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Heart, Sparkles } from "lucide-react";
-import { switchTrack } from "@/components/shared/MusicPlayer";
 
 const CHAPTERS = [
   { id: "ybs", name: "YBS", color: "#FF6B9D", year: "2019-2025", icon: "🎭" },
@@ -34,11 +33,6 @@ interface Props {
 }
 
 export function Timeline({ visited, onSelect, onCelebrate, scrollPosition, onScrollChange }: Props) {
-  // Switch back to main theme when returning to timeline
-  useEffect(() => {
-    switchTrack('bill');
-  }, []);
-
   useEffect(() => {
     const container = document.getElementById('timeline-container');
     if (container) {

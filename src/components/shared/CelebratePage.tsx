@@ -42,9 +42,14 @@ export function CelebratePage({ onBack }: Props) {
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
   const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
-  // Switch to BTS song when page loads
+  // Switch to BTS song when Celebrate page loads
   useEffect(() => {
     switchTrack('bts');
+    
+    // Switch back to main theme when leaving Celebrate page
+    return () => {
+      switchTrack('bill');
+    };
   }, []);
 
   const handleImageLoad = (index: number) => {

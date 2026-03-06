@@ -82,20 +82,27 @@ export function PreloadAssets({ onComplete }: PreloadAssetsProps) {
       onComplete();
     };
 
-    // STEP 3: Preload music in background (doesn't block start)
+    // STEP 3: Preload ALL music in background (doesn't block start)
     const musicFiles = [
       '/music/Bill Withers  - Just The Two Of Us.mp3',
       '/music/Craig David - 7 Days.mp3',
-      '/music/BTS - I Need U (Piano).mp3'
+      '/music/BTS - I Need U (Piano).mp3',
+      '/music/Don Toliver (feat. Doja Cat) - Lose My Mind.m4a',
     ];
 
     musicFiles.forEach((src) => {
       const audio = new Audio();
       audio.src = src;
       audio.preload = 'auto';
+      audio.oncanplaythrough = () => {
+        console.log(`   ✅ Music cached: ${src.split('/').pop()}`);
+      };
+      audio.onerror = () => {
+        console.warn(`   ⚠️ Music failed: ${src.split('/').pop()}`);
+      };
       audio.load();
     });
-    console.log('🎵 Music preloading in background...');
+    console.log('🎵 Preloading all 4 music tracks in background...');
   }, [onComplete]);
 
   return (
