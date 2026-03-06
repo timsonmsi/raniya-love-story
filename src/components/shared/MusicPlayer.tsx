@@ -98,7 +98,7 @@ export const startGlobalAudio = async () => {
   }
 };
 
-export const switchTrack = (track: 'bill' | 'craig' | 'bts') => {
+export const switchTrack = (track: 'bill' | 'craig' | 'bts' | 'f1') => {
   if (!globalAudio) return;
 
   if (track === currentTrack) return;
@@ -110,6 +110,8 @@ export const switchTrack = (track: 'bill' | 'craig' | 'bts') => {
     globalAudio.src = '/music/Craig David - 7 Days.mp3';
   } else if (track === 'bts') {
     globalAudio.src = '/music/BTS - I Need U (Piano).mp3';
+  } else if (track === 'f1') {
+    globalAudio.src = '/music/Don Toliver (feat. Doja Cat) - Lose My Mind.m4a';
   } else {
     globalAudio.src = '/music/Bill Withers  - Just The Two Of Us.mp3';
   }

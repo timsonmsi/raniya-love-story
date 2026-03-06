@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Film, Clapperboard } from "lucide-react";
+import { switchTrack } from "@/components/shared/MusicPlayer";
 
 const COLOR = "#7E57C2";
 const BG = "#0a0a1a";
@@ -22,6 +23,12 @@ function StageDots({ stage, total }: { stage: number; total: number }) {
 
 export function ChapterF1({ onBack }: Props) {
   const [stage, setStage] = useState(1);
+
+  // Switch to F1 song when chapter loads
+  useEffect(() => {
+    switchTrack('f1');
+  }, []);
+
   return (
     <div className="w-full h-full relative overflow-hidden" style={{ background: BG }}>
       <StageDots stage={stage} total={4} />
