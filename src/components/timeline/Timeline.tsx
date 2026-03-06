@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Heart, Sparkles } from "lucide-react";
+import { switchTrack } from "@/components/shared/MusicPlayer";
 
 const CHAPTERS = [
   { id: "ybs", name: "YBS", color: "#FF6B9D", year: "2019-2025", icon: "🎭" },
@@ -33,6 +34,11 @@ interface Props {
 }
 
 export function Timeline({ visited, onSelect, onCelebrate, scrollPosition, onScrollChange }: Props) {
+  // Switch back to main theme when returning to timeline
+  useEffect(() => {
+    switchTrack('bill');
+  }, []);
+
   useEffect(() => {
     const container = document.getElementById('timeline-container');
     if (container) {
@@ -326,7 +332,7 @@ export function Timeline({ visited, onSelect, onCelebrate, scrollPosition, onScr
                     ease: "easeInOut",
                   },
                 }}
-                className="px-6 py-2 rounded-full text-xs tracking-[0.2em] uppercase font-bold cursor-pointer pointer-events-auto relative overflow-hidden group whitespace-nowrap"
+                className="px-9 py-3 rounded-full text-sm tracking-[0.2em] uppercase font-bold cursor-pointer pointer-events-auto relative overflow-hidden group whitespace-nowrap"
                 style={{
                   background: "linear-gradient(135deg, rgba(255,107,157,0.5), rgba(0,240,255,0.5), rgba(181,0,255,0.5))",
                   border: "1px solid rgba(255,255,255,0.4)",
@@ -335,7 +341,7 @@ export function Timeline({ visited, onSelect, onCelebrate, scrollPosition, onScr
                   backdropFilter: 'blur(10px)',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px',
+                  gap: '6px',
                 }}
               >
                 {/* Animated shimmer */}
@@ -346,9 +352,9 @@ export function Timeline({ visited, onSelect, onCelebrate, scrollPosition, onScr
                     backgroundSize: '200% 200%',
                   }}
                 />
-                <Sparkles size={12} />
+                <Sparkles size={18} />
                 <span>Celebrate</span>
-                <Sparkles size={12} />
+                <Sparkles size={18} />
               </motion.button>
             </div>
           )}
